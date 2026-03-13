@@ -51,7 +51,8 @@ class TestHelpers:
     def test_generate_monthly_partitions(self):
         """Monthly partitions should cover start to end inclusive."""
         partitions = generate_monthly_partitions(
-            date(2024, 1, 1), date(2024, 3, 15),
+            date(2024, 1, 1),
+            date(2024, 3, 15),
         )
         assert len(partitions) == 3
         assert partitions[0] == {"year": "2024", "month": "01"}
@@ -61,7 +62,8 @@ class TestHelpers:
     def test_generate_monthly_partitions_cross_year(self):
         """Partitions should cross year boundaries correctly."""
         partitions = generate_monthly_partitions(
-            date(2023, 11, 1), date(2024, 2, 1),
+            date(2023, 11, 1),
+            date(2024, 2, 1),
         )
         assert len(partitions) == 4
         assert partitions[0] == {"year": "2023", "month": "11"}
@@ -124,10 +126,20 @@ class TestTapConfig:
         schema = TapCopernicus.config_jsonschema
         props = schema.get("properties", {})
         expected_settings = [
-            "cds_api_key", "cds_url", "variables", "product_types",
-            "pressure_levels", "start_date", "end_date", "hours",
-            "bounding_box", "grid_resolution", "poll_interval_seconds",
-            "request_timeout_seconds", "output_format", "temp_dir",
+            "cds_api_key",
+            "cds_url",
+            "variables",
+            "product_types",
+            "pressure_levels",
+            "start_date",
+            "end_date",
+            "hours",
+            "bounding_box",
+            "grid_resolution",
+            "poll_interval_seconds",
+            "request_timeout_seconds",
+            "output_format",
+            "temp_dir",
             "strict_mode",
         ]
         for setting in expected_settings:

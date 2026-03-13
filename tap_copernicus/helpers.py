@@ -111,9 +111,7 @@ CDS_TO_NETCDF_VARIABLE_MAP: dict[str, str] = {
     "skin_reservoir_content": "src",
 }
 
-NETCDF_TO_CDS_VARIABLE_MAP: dict[str, str] = {
-    v: k for k, v in CDS_TO_NETCDF_VARIABLE_MAP.items()
-}
+NETCDF_TO_CDS_VARIABLE_MAP: dict[str, str] = {v: k for k, v in CDS_TO_NETCDF_VARIABLE_MAP.items()}
 
 
 # ---------------------------------------------------------------------------
@@ -131,10 +129,43 @@ DATASET_START_DATES: dict[str, str] = {
 
 # All 37 ERA5 pressure levels in hPa
 ALL_PRESSURE_LEVELS: list[int] = [
-    1, 2, 3, 5, 7, 10, 20, 30, 50, 70,
-    100, 125, 150, 175, 200, 225, 250, 300, 350, 400,
-    450, 500, 550, 600, 650, 700, 750, 775, 800, 825,
-    850, 875, 900, 925, 950, 975, 1000,
+    1,
+    2,
+    3,
+    5,
+    7,
+    10,
+    20,
+    30,
+    50,
+    70,
+    100,
+    125,
+    150,
+    175,
+    200,
+    225,
+    250,
+    300,
+    350,
+    400,
+    450,
+    500,
+    550,
+    600,
+    650,
+    700,
+    750,
+    775,
+    800,
+    825,
+    850,
+    875,
+    900,
+    925,
+    950,
+    975,
+    1000,
 ]
 
 # ERA5 data lag: final data available ~5 days after real-time.
@@ -207,10 +238,12 @@ def generate_monthly_partitions(
     partitions: list[dict[str, str]] = []
     current = start_date.replace(day=1)
     while current <= end_date:
-        partitions.append({
-            "year": str(current.year),
-            "month": f"{current.month:02d}",
-        })
+        partitions.append(
+            {
+                "year": str(current.year),
+                "month": f"{current.month:02d}",
+            }
+        )
         if current.month == _DECEMBER:
             current = current.replace(year=current.year + 1, month=1)
         else:

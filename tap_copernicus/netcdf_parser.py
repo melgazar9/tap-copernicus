@@ -57,9 +57,7 @@ class NetCDFParser:
         Yields:
             Flat record dicts with time, lat, lon, variable, value, units, etc.
         """
-        expected_netcdf_names = {
-            CDS_TO_NETCDF_VARIABLE_MAP.get(v, v) for v in requested_variables
-        }
+        expected_netcdf_names = {CDS_TO_NETCDF_VARIABLE_MAP.get(v, v) for v in requested_variables}
 
         ds = xr.open_dataset(file_path)
         try:
@@ -80,7 +78,9 @@ class NetCDFParser:
 
                 if df.empty:
                     logger.debug(
-                        "No valid data for variable '%s' in %s", nc_var_name, file_path,
+                        "No valid data for variable '%s' in %s",
+                        nc_var_name,
+                        file_path,
                     )
                     continue
 
@@ -108,8 +108,15 @@ class NetCDFParser:
 
                 # Select and order output columns
                 output_cols = [
-                    "time", "latitude", "longitude", "variable",
-                    "value", "units", "dataset", "product_type", "expver",
+                    "time",
+                    "latitude",
+                    "longitude",
+                    "variable",
+                    "value",
+                    "units",
+                    "dataset",
+                    "product_type",
+                    "expver",
                 ]
                 if "pressure_level" in df.columns:
                     df["pressure_level"] = df["pressure_level"].astype(int)

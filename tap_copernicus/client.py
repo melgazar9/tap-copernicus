@@ -177,7 +177,10 @@ class CDSClient:
 
             logger.info(
                 "CDS request state=%s for %s (elapsed=%.0fs). Polling in %ds...",
-                state, dataset, elapsed, self._poll_interval,
+                state,
+                dataset,
+                elapsed,
+                self._poll_interval,
             )
             time.sleep(self._poll_interval)
 
@@ -277,7 +280,9 @@ class CopernicusStream(Stream):
                 if not data_files:
                     logger.warning(
                         "No data files found after download for %s (year=%s, month=%s)",
-                        self.dataset_name, year, month,
+                        self.dataset_name,
+                        year,
+                        month,
                     )
                     continue
 
@@ -296,14 +301,21 @@ class CopernicusStream(Stream):
 
                 logger.info(
                     "Emitted %d records from %s (product_type=%s, year=%s, month=%s)",
-                    record_count, self.dataset_name, product_type, year, month,
+                    record_count,
+                    self.dataset_name,
+                    product_type,
+                    year,
+                    month,
                 )
 
             except (RuntimeError, TimeoutError, OSError):
                 logger.exception(
                     "CDS request failed for %s (year=%s, month=%s, product_type=%s). "
                     "Skipping partition.",
-                    self.dataset_name, year, month, product_type,
+                    self.dataset_name,
+                    year,
+                    month,
+                    product_type,
                 )
                 if self.config.get("strict_mode", False):
                     raise
@@ -427,7 +439,8 @@ class CopernicusStream(Stream):
         if missing_in_record:
             logger.debug(
                 "Fields in schema but not in record for stream '%s': %s",
-                self.name, missing_in_record,
+                self.name,
+                missing_in_record,
             )
 
         extra_in_record = record_fields - schema_fields
@@ -435,7 +448,8 @@ class CopernicusStream(Stream):
             logger.warning(
                 "SCHEMA DRIFT: Fields in record but not in schema for stream '%s': %s. "
                 "Update the stream schema to include these fields.",
-                self.name, extra_in_record,
+                self.name,
+                extra_in_record,
             )
 
 
@@ -473,9 +487,7 @@ def _extract_data_files(download_path: str, extract_dir: str) -> list[str]:
 
         if not data_files:
             # If no recognized extensions, try all files (CDS may use odd names)
-            data_files = [
-                str(p) for p in extract_path.iterdir() if p.is_file()
-            ]
+            data_files = [str(p) for p in extract_path.iterdir() if p.is_file()]
 
         logger.info("Extracted %d data file(s) from ZIP", len(data_files))
         return sorted(data_files)

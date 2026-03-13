@@ -105,8 +105,7 @@ class TapCopernicus(Tap):
             th.DateType,
             title="End Date",
             description=(
-                "Latest date to extract (YYYY-MM-DD). "
-                "Default: 5 days before today (ERA5 data lag)."
+                "Latest date to extract (YYYY-MM-DD). Default: 5 days before today (ERA5 data lag)."
             ),
         ),
         th.Property(

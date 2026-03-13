@@ -87,8 +87,13 @@ class ERA5HourlyPressureLevelsStream(CopernicusStream):
 
     schema = PRESSURE_LEVEL_SCHEMA
     primary_keys = (
-        "time", "latitude", "longitude", "variable",
-        "pressure_level", "product_type", "expver",
+        "time",
+        "latitude",
+        "longitude",
+        "variable",
+        "pressure_level",
+        "product_type",
+        "expver",
     )
 
 
@@ -171,8 +176,13 @@ class ERA5MonthlyPressureLevelsStream(CopernicusStream):
 
     schema = PRESSURE_LEVEL_SCHEMA
     primary_keys = (
-        "time", "latitude", "longitude", "variable",
-        "pressure_level", "product_type", "expver",
+        "time",
+        "latitude",
+        "longitude",
+        "variable",
+        "pressure_level",
+        "product_type",
+        "expver",
     )
 
 
