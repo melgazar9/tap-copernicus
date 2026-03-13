@@ -1,13 +1,15 @@
-send_anonymous_usage_stats: true
+version: 1
+send_anonymous_usage_stats: false
 project_id: "tap-copernicus"
 default_environment: test
-requires_meltano: ">=4.0"
+
 environments:
 - name: test
+
 plugins:
   extractors:
-  - name: "tap-copernicus"
-    namespace: "tap_copernicus"
+  - name: tap-copernicus
+    namespace: tap_copernicus
     pip_url: -e .
     capabilities:
     - state
@@ -15,32 +17,132 @@ plugins:
     - discover
     - about
     - stream-maps
-    - structured-logging
 
-    # TODO: Declare settings and their types here:
     settings:
-    - name: username
-      label: Username
-      description: The username to use for authentication
-
-    - name: password
+    - name: cds_api_key
       kind: password
-      label: Password
-      description: The password to use for authentication
+      label: CDS API Key
+      description: >
+        Copernicus CDS Personal Access Token.
+        Obtain from https://cds.climate.copernicus.eu/ under your profile.
       sensitive: true
+
+    - name: cds_url
+      kind: string
+      label: CDS API URL
+      value: "https://cds.climate.copernicus.eu/api"
+      description: CDS API base URL.
+
+    - name: variables
+      kind: array
+      label: Variables
+      description: >
+        CDS variable names to extract. If not set, each stream uses defaults.
+
+    - name: product_types
+      kind: array
+      label: Product Types
+      description: >
+        CDS product types. Default: ['reanalysis'].
+        Set to ['all'] for all available types per dataset.
+
+    - name: pressure_levels
+      kind: array
+      label: Pressure Levels
+      description: "Pressure levels in hPa. Default: all 37 levels."
 
     - name: start_date
       kind: date_iso8601
       label: Start Date
-      description: Initial date to start extracting data from
+      value: "1940-01-01"
+      description: Earliest date to extract (YYYY-MM-DD).
 
-    # TODO: Declare required settings here:
+    - name: end_date
+      kind: date_iso8601
+      label: End Date
+      description: >
+        Latest date to extract. Default: 5 days before today (ERA5 lag).
+
+    - name: hours
+      kind: array
+      label: Hours
+      value: ["00:00", "06:00", "12:00", "18:00"]
+      description: >
+        Hours to extract. Set to ['*'] for all 24 hours.
+
+    - name: bounding_box
+      kind: object
+      label: Bounding Box
+      value:
+        north: 50.0
+        west: -125.0
+        south: 24.0
+        east: -66.0
+      description: >
+        Geographic bounding box {north, west, south, east} in degrees.
+        Default: CONUS.
+
+    - name: grid_resolution
+      kind: array
+      label: Grid Resolution
+      value: [1.0, 1.0]
+      description: >
+        Output grid [lat_step, lon_step] in degrees. Default: 1.0.
+        Native ERA5: 0.25, ERA5-Land: 0.1.
+
+    - name: poll_interval_seconds
+      kind: integer
+      label: Poll Interval
+      value: 30
+      description: Seconds between CDS status polls.
+
+    - name: request_timeout_seconds
+      kind: integer
+      label: Request Timeout
+      value: 7200
+      description: Max seconds to wait per CDS request (default 2h).
+
+    - name: output_format
+      kind: string
+      label: Output Format
+      value: "netcdf"
+      description: Download format - 'netcdf' or 'grib'.
+
+    - name: temp_dir
+      kind: string
+      label: Temp Directory
+      description: Temp directory for downloaded files. Default system temp.
+
+    - name: strict_mode
+      kind: boolean
+      label: Strict Mode
+      value: false
+      description: Raise on CDS failures instead of skipping.
+
     settings_group_validation:
-    - [username, password]
+    - [cds_api_key]
 
-    # TODO: Declare default configuration values here:
+    # Default: extract hourly single levels only.
+    # Enable other streams by adding them to select.
+    select:
+    - era5_hourly_single_levels.*
+
     config:
-      start_date: 6 months ago
+      cds_api_key: $COPERNICUS_API_KEY
+      start_date: "2024-01-01"
+      hours:
+      - "00:00"
+      - "06:00"
+      - "12:00"
+      - "18:00"
+      bounding_box:
+        north: 50.0
+        west: -125.0
+        south: 24.0
+        east: -66.0
+      grid_resolution: [1.0, 1.0]
+      poll_interval_seconds: 30
+      request_timeout_seconds: 7200
 
   loaders:
   - name: target-jsonl

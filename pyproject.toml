@@ -8,12 +8,16 @@ build-backend = "hatchling.build"
 [project]
 name = "tap-copernicus"
 version = "0.0.1"
-description = "Singer tap for Copernicus, built with the Meltano Singer SDK."
+description = "Singer tap for Copernicus Climate Data Store (ERA5 reanalysis weather data), built with the Meltano Singer SDK."
 readme = "README.md"
 authors = [{ name = "Matt Elgazar", email = "melgazar9@gmail.com" }]
 keywords = [
     "ELT",
     "Copernicus",
+    "ERA5",
+    "weather",
+    "reanalysis",
+    "climate",
 ]
 classifiers = [
     "Intended Audience :: Developers",
@@ -22,7 +26,6 @@ classifiers = [
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.13",
-    "Programming Language :: Python :: 3.14",
 ]
 license = "MIT"
 license-files = [ "LICENSE" ]
@@ -30,9 +33,18 @@ requires-python = ">=3.10"
 dependencies = [
     "singer-sdk~=0.53.5",
     "typing-extensions>=4.5.0; python_version < '3.13'",
+    "cdsapi>=0.7.5",
+    "xarray>=2024.1.0",
+    "netcdf4>=1.6.0",
+    "numpy>=1.26.0",
+    "pandas>=2.1.0",
 ]
 
 [project.optional-dependencies]
+grib = [
+    "cfgrib>=0.9.10",
+    "eccodes>=1.6.0",
+]
 s3 = [
     "s3fs>=2026.1.0",
 ]
@@ -52,6 +64,7 @@ test = [
 ]
 typing = [
     "mypy>=1.19.1",
+    "ruff>=0.15.6",
     "ty>=0.0.18",
     "types-requests",
 ]
@@ -89,6 +102,16 @@ warn_unreachable = true
 warn_unused_configs = true
 warn_unused_ignores = true
 
+[[tool.mypy.overrides]]
+module = [
+    "cdsapi",
+    "pandas",
+    "xarray",
+    "numpy",
+    "netCDF4",
+]
+ignore_missing_imports = true
+
 [tool.ty.rules]
 unused-type-ignore-comment = "ignore"
 
@@ -106,6 +129,14 @@ select = ["ALL"]
 [tool.ruff.lint.flake8-annotations]
 allow-star-arg-any = true
 
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = [
+    "ANN201",  # Missing return type annotation for public function (test methods)
+    "S101",    # Use of assert (expected in tests)
+    "PLR2004", # Magic value used in comparison (expected in tests)
+    "SLF001",  # Private member accessed (needed to test internal methods)
+]
+
 [tool.ruff.lint.pydocstyle]
 convention = "google"
 
@@ -119,7 +150,7 @@ requires = [
 env_list = [
     "typing",
     { product = [
-        { prefix = "3.", start = 10 },
+        { prefix = "3.", start = 10, end = 13 },
     ] },
 ]
 
@@ -128,6 +159,7 @@ runner = "uv-venv-lock-runner"
 pass_env = [
     "GITHUB_*",
     "TAP_COPERNICUS_*",
+    "CDS_API_KEY",
 ]
 dependency_groups = [ "test" ]
 commands = [ [ "pytest", { replace = "posargs", default = [ "tests" ], extend = true } ] ]
